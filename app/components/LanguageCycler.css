@@ -1,0 +1,16 @@
+.language-cycler {
+  display: inline-flex;
+  position: relative;
+  min-width: auto;
+  justify-content: center;
+  transition: color 0.6s ease;
+  vertical-align: baseline;
+}
+
+.language-word {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: inherit;
+  line-height: inherit;
+  font-family: inherit;
+}
