@@ -7,3 +7,12 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# Environment variables required for production
+# Set these in Netlify Site Settings > Build & Deploy > Environment
+# NEXT_PUBLIC_SUPABASE_URL
+# SUPABASE_SERVICE_ROLE_KEY
+# GEMINI_API_KEY
+# POLLINATIONS_API_KEY (optional)
+# HUGGINGFACE_API_KEY (optional)
+# HUGGINGFACE_API_TOKEN (optional)
