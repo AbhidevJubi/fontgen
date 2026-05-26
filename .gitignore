@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# example and documentation files
+EXAMPLE_*.tsx
+EXAMPLE_*.ts
+*_EXAMPLE.tsx
+*_EXAMPLE.ts
