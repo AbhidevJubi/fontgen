@@ -1,7 +1,7 @@
 /**
  * Supabase client initialization for Next.js
  * Used for server-side operations only
- * 
+ *
  * Uses lazy initialization to support builds without environment variables
  */
 

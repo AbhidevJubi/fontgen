@@ -28,6 +28,12 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# example/documentation files
+EXAMPLE_*.tsx
+EXAMPLE_*.ts
+*_EXAMPLE.tsx
+*_EXAMPLE.ts
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
