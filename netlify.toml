@@ -1,6 +1,9 @@
 [build]
-  command = "npm install && npm run build"
-  publish = ".netlify/output"
+  command = "npm run build"
+  publish = ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[functions]
+  node_bundler = "esbuild"
