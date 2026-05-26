@@ -12,6 +12,19 @@ interface FontLightboxProps {
   onClose: () => void;
 }
 
+type StyleAnalysis = {
+  fontSize?: string | number;
+  fontFamily?: string;
+  fontWeight?: string;
+  textColor?: string;
+  strokeColor?: string;
+  textStroke?: string | number;
+  shadowColor?: string;
+  shadowBlur?: string | number;
+  shadowOffsetX?: string | number;
+  shadowOffsetY?: string | number;
+};
+
 export default function FontLightbox({ font, onClose }: FontLightboxProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -117,7 +130,10 @@ export default function FontLightbox({ font, onClose }: FontLightboxProps) {
         );
 
         // Draw text on green background according to styleAnalysis (best-effort)
-        const renderTextOnGreen = (text: string, analysis: any) => {
+        const renderTextOnGreen = (
+          text: string,
+          analysis: StyleAnalysis | string | undefined,
+        ) => {
           // Use larger canvas for better quality text rendering
           const width = 3200;
           const height = 800;
@@ -143,31 +159,38 @@ export default function FontLightbox({ font, onClose }: FontLightboxProps) {
           let shadowOffsetX = 0;
           let shadowOffsetY = 0;
 
-          if (analysis && typeof analysis === "object") {
-            if (analysis.fontSize) {
+          if (
+            analysis &&
+            typeof analysis === "object" &&
+            !Array.isArray(analysis)
+          ) {
+            const styleData = analysis as StyleAnalysis;
+            if (styleData.fontSize) {
               const n = parseInt(
-                String(analysis.fontSize).replace(/[^0-9]/g, ""),
+                String(styleData.fontSize).replace(/[^0-9]/g, ""),
                 10,
               );
               if (!Number.isNaN(n)) fontSize = Math.max(100, Math.min(600, n));
             }
-            if (analysis.fontFamily) fontFamily = analysis.fontFamily;
-            if (analysis.fontWeight)
-              fontWeight = analysis.fontWeight.includes("bold") ? "700" : "400";
-            if (analysis.textColor) fillStyle = analysis.textColor;
-            if (analysis.strokeColor) {
-              strokeStyle = analysis.strokeColor;
-              strokeWidth = analysis.textStroke
-                ? Number(analysis.textStroke) || 3
+            if (styleData.fontFamily) fontFamily = styleData.fontFamily;
+            if (styleData.fontWeight)
+              fontWeight = styleData.fontWeight.includes("bold")
+                ? "700"
+                : "400";
+            if (styleData.textColor) fillStyle = styleData.textColor;
+            if (styleData.strokeColor) {
+              strokeStyle = styleData.strokeColor;
+              strokeWidth = styleData.textStroke
+                ? Number(styleData.textStroke) || 3
                 : 3;
             }
-            if (analysis.shadowColor) shadowColor = analysis.shadowColor;
-            if (analysis.shadowBlur)
-              shadowBlur = Number(analysis.shadowBlur) || 0;
-            if (analysis.shadowOffsetX)
-              shadowOffsetX = Number(analysis.shadowOffsetX) || 0;
-            if (analysis.shadowOffsetY)
-              shadowOffsetY = Number(analysis.shadowOffsetY) || 0;
+            if (styleData.shadowColor) shadowColor = styleData.shadowColor;
+            if (styleData.shadowBlur)
+              shadowBlur = Number(styleData.shadowBlur) || 0;
+            if (styleData.shadowOffsetX)
+              shadowOffsetX = Number(styleData.shadowOffsetX) || 0;
+            if (styleData.shadowOffsetY)
+              shadowOffsetY = Number(styleData.shadowOffsetY) || 0;
           } else if (typeof analysis === "string") {
             // Try to parse simple hex color occurrences
             const hexMatch = analysis.match(/#([0-9a-fA-F]{6})/);
@@ -432,7 +455,7 @@ export default function FontLightbox({ font, onClose }: FontLightboxProps) {
             </div>
 
             <div className="form-notes">
-              <p className="note-item">🚫 Don&apos;t use special characters.</p>
+              <p className="note-item">🚫 Do not use special characters.</p>
               <p className="note-item">
                 ⚡ AI will match the exact font style from {font.movieName}.
               </p>

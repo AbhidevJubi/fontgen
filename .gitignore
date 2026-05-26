@@ -51,3 +51,6 @@ EXAMPLE_*.tsx
 EXAMPLE_*.ts
 *_EXAMPLE.tsx
 *_EXAMPLE.ts
+
+# Local Netlify folder
+.netlify

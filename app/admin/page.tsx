@@ -198,13 +198,13 @@ export default function AdminPage() {
             : ["/images/hero2.jpg", "/images/hero3.jpg"],
       };
 
-      let createdMovieId: string = editId || generateUniqueId();
+      let createdMovieId: string = editId || "";
       if (editId) {
         await updateMovie({ id: editId, ...movieData });
         alert("Movie font saved successfully.");
       } else {
         const createdMovie = await createMovie(movieData);
-        createdMovieId = createdMovie.id || generateUniqueId();
+        createdMovieId = (createdMovie.id as string) || generateUniqueId();
         alert("Movie font saved successfully.");
       }
 

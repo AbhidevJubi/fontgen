@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export const dynamic = "force-dynamic";
-
 /**
  * Gemini Image Generation API for Movie Titles
  * POST /api/generate-title
@@ -125,13 +123,9 @@ Return ONLY valid JSON (no markdown, no code blocks, no explanations):
       ]);
 
       const analysisText =
-        analysisResponse.response.candidates?.[0]?.content.parts?.[0]?.text ||
-        "";
+        analysisResponse.response.candidates?.[0]?.content.parts?.[0]?.text || "";
 
-      console.log(
-        "Analysis response (preview):",
-        analysisText.substring(0, 150) + "...",
-      );
+      console.log("Analysis response (preview):", analysisText.substring(0, 150) + "...");
 
       // Extract JSON from response (might have markdown formatting)
       const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
@@ -142,10 +136,7 @@ Return ONLY valid JSON (no markdown, no code blocks, no explanations):
         styleInfo = { raw: analysisText };
       }
     } catch (e) {
-      console.warn(
-        "⚠️ Phase 1 Gemini Style Analysis threw error (using fallback defaults):",
-        e,
-      );
+      console.warn("⚠️ Phase 1 Gemini Style Analysis threw error (using fallback defaults):", e);
       styleInfo = {
         fontDescription: "serif, bold, normal style, cinematic structure",
         textColor: "Metallic golden bronze/copper with highlights",
@@ -163,10 +154,9 @@ Return ONLY valid JSON (no markdown, no code blocks, no explanations):
         hasGradient: true,
         gradientColors: "gold, copper, reddish-brown",
         hasSpecialEffects: true,
-        specialEffects:
-          "3D volumetric text with depth, scratched weathered metallic texture, and rustic highlights",
+        specialEffects: "3D volumetric text with depth, scratched weathered metallic texture, and rustic highlights",
         overallStyle: "Ancient, powerful, sculpted metallic epic text.",
-        colorHex: "#FFD700",
+        colorHex: "#FFD700"
       };
     }
 
@@ -244,22 +234,19 @@ Your output must be a valid image file with styled text on green background, wit
 
       if (hasImage) {
         console.log(
-          `✅ POSITIVE RESPONSE: Gemini generated image successfully! (Size: ${imageSize} bytes)`,
+          `✅ POSITIVE RESPONSE: Gemini generated image successfully! (Size: ${imageSize} bytes)`
         );
       } else if (hasTextResponse) {
         console.log(
-          `⚠️ UNEXPECTED RESPONSE: Gemini returned TEXT instead of IMAGE (${partsCount} parts, content: ${responseParts[0]?.text?.substring(0, 100) || "N/A"})`,
+          `⚠️ UNEXPECTED RESPONSE: Gemini returned TEXT instead of IMAGE (${partsCount} parts, content: ${responseParts[0]?.text?.substring(0, 100) || "N/A"})`
         );
       } else {
         console.log(
-          `❌ NEGATIVE RESPONSE: Gemini did not generate image (${partsCount} parts received, no image data found)`,
+          `❌ NEGATIVE RESPONSE: Gemini did not generate image (${partsCount} parts received, no image data found)`
         );
       }
     } catch (e) {
-      console.warn(
-        "⚠️ Gemini generation failed (likely model not available or network error). Trying alternative workflows...",
-        e,
-      );
+      console.warn("⚠️ Gemini generation failed (likely model not available or network error). Trying alternative workflows...", e);
     }
 
     if (generatedImage?.inlineData?.data) {
@@ -280,9 +267,7 @@ Your output must be a valid image file with styled text on green background, wit
         { status: 200 },
       );
     } else {
-      console.log(
-        "❌ GEMINI FAILED: No image found in response. Attempting fallback providers...",
-      );
+      console.log("❌ GEMINI FAILED: No image found in response. Attempting fallback providers...");
     }
 
     // ===================================================================
@@ -318,8 +303,8 @@ CRITICAL REQUIREMENTS:
         console.log("🚀 Calling Authenticated Pollinations API:", url);
         pollinationsRes = await fetch(url, {
           headers: {
-            Authorization: `Bearer ${pollinationsApiKey}`,
-          },
+            "Authorization": `Bearer ${pollinationsApiKey}`
+          }
         });
       } else {
         // Fall back directly to the legacy keyless prompt endpoint which bypasses 401 rate limitations
@@ -331,9 +316,7 @@ CRITICAL REQUIREMENTS:
 
       // If key-based request returned 401, retry keyless legacy fallback!
       if (!pollinationsRes.ok && pollinationsRes.status === 401) {
-        console.warn(
-          "⚠️ Premium Pollinations API returned 401. Retrying with legacy keyless endpoint...",
-        );
+        console.warn("⚠️ Premium Pollinations API returned 401. Retrying with legacy keyless endpoint...");
         const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1920&height=1080&nologo=true`;
         pollinationsRes = await fetch(url);
         usedModel = "Pollinations (Legacy Keyless)";
@@ -343,7 +326,7 @@ CRITICAL REQUIREMENTS:
         const buffer = await pollinationsRes.arrayBuffer();
         const base64 = Buffer.from(buffer).toString("base64");
         console.log(
-          `✅ POSITIVE RESPONSE: Pollinations AI generated image successfully! Model: ${usedModel} (Size: ${base64.length} bytes)`,
+          `✅ POSITIVE RESPONSE: Pollinations AI generated image successfully! Model: ${usedModel} (Size: ${base64.length} bytes)`
         );
         return NextResponse.json({
           success: true,
@@ -351,28 +334,23 @@ CRITICAL REQUIREMENTS:
           movieName,
           model: usedModel,
           styleAnalysis: styleInfo,
-          debug: {
-            provider: "pollinations",
-            success: true,
-            source: "fallback",
-          },
+          debug: { provider: "pollinations", success: true, source: "fallback" }
         });
       } else {
         console.warn(
-          `❌ NEGATIVE RESPONSE: Pollinations API returned non-ok status: ${pollinationsRes.status} - ${pollinationsRes.statusText}`,
+          `❌ NEGATIVE RESPONSE: Pollinations API returned non-ok status: ${pollinationsRes.status} - ${pollinationsRes.statusText}`
         );
       }
     } catch (e) {
       console.error(
-        `❌ NEGATIVE RESPONSE: Pollinations AI fallback failed with error: ${e instanceof Error ? e.message : String(e)}`,
+        `❌ NEGATIVE RESPONSE: Pollinations AI fallback failed with error: ${e instanceof Error ? e.message : String(e)}`
       );
     }
 
     // ===================================================================
     // FALLBACK 2: Hugging Face Inference API (Flux Schnell)
     // ===================================================================
-    const hfToken =
-      process.env.HUGGINGFACE_API_KEY || process.env.HUGGINGFACE_API_TOKEN;
+    const hfToken = process.env.HUGGINGFACE_API_KEY || process.env.HUGGINGFACE_API_TOKEN;
     if (hfToken) {
       try {
         console.log("🔁 Trying Hugging Face Inference API...");
@@ -391,26 +369,24 @@ CRITICAL REQUIREMENTS:
 1. The background MUST be a flat, solid, uniform pure bright green (#00FF00) color suitable for green screen chroma keying.
 2. Only the text "${userText.toUpperCase()}" should be visible, perfectly centered horizontally and vertically. No other background elements, textures, objects, or borders.
 3. The letters must be sharp, high resolution, and correctly spelled.
-4. DO NOT add any shadows, drop shadows, or shadow effects. Generate clean text without shadows.
-3. The letters must be sharp, high resolution, and correctly spelled.`;
+4. DO NOT add any shadows, drop shadows, or shadow effects. Generate clean text without shadows.`;
 
-        const hfUrl =
-          "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+        const hfUrl = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
         console.log("🚀 Calling Hugging Face Inference API...");
         const hfRes = await fetch(hfUrl, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${hfToken}`,
+            "Authorization": `Bearer ${hfToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ inputs: hfPrompt }),
+          body: JSON.stringify({ inputs: hfPrompt })
         });
 
         if (hfRes.ok) {
           const buffer = await hfRes.arrayBuffer();
           const base64 = Buffer.from(buffer).toString("base64");
           console.log(
-            `✅ POSITIVE RESPONSE: Hugging Face FLUX generated image successfully! (Size: ${base64.length} bytes)`,
+            `✅ POSITIVE RESPONSE: Hugging Face FLUX generated image successfully! (Size: ${base64.length} bytes)`
           );
           return NextResponse.json({
             success: true,
@@ -418,20 +394,16 @@ CRITICAL REQUIREMENTS:
             movieName,
             model: "Hugging Face (Flux)",
             styleAnalysis: styleInfo,
-            debug: {
-              provider: "huggingface",
-              success: true,
-              source: "fallback",
-            },
+            debug: { provider: "huggingface", success: true, source: "fallback" }
           });
         } else {
           console.warn(
-            `❌ NEGATIVE RESPONSE: Hugging Face returned status: ${hfRes.status} - ${hfRes.statusText}`,
+            `❌ NEGATIVE RESPONSE: Hugging Face returned status: ${hfRes.status} - ${hfRes.statusText}`
           );
         }
       } catch (e) {
         console.error(
-          `❌ NEGATIVE RESPONSE: Hugging Face fallback failed with error: ${e instanceof Error ? e.message : String(e)}`,
+          `❌ NEGATIVE RESPONSE: Hugging Face fallback failed with error: ${e instanceof Error ? e.message : String(e)}`
         );
       }
     }
@@ -485,7 +457,7 @@ Render text centered on pure green background #00FF00. Return PNG image bytes.`,
           const maybeBase64 = findBase64(fallbackJson);
           if (maybeBase64) {
             console.log(
-              `✅ POSITIVE RESPONSE: Imagen generated image successfully! (Size: ${maybeBase64.length} bytes)`,
+              `✅ POSITIVE RESPONSE: Imagen generated image successfully! (Size: ${maybeBase64.length} bytes)`
             );
             return NextResponse.json(
               {
@@ -494,28 +466,24 @@ Render text centered on pure green background #00FF00. Return PNG image bytes.`,
                 movieName,
                 model: "imagen-4.0-generate-001",
                 styleAnalysis: styleInfo,
-                debug: {
-                  fallbackProvider: "imagen",
-                  fallbackFound: true,
-                  source: "fallback",
-                },
+                debug: { fallbackProvider: "imagen", fallbackFound: true, source: "fallback" },
               },
               { status: 200 },
             );
           } else {
             console.warn(
-              `❌ NEGATIVE RESPONSE: Imagen API returned OK but no image data found in response`,
+              `❌ NEGATIVE RESPONSE: Imagen API returned OK but no image data found in response`
             );
           }
         } else {
           console.warn(
-            `❌ NEGATIVE RESPONSE: Imagen API returned status: ${fallbackRes.status}`,
+            `❌ NEGATIVE RESPONSE: Imagen API returned status: ${fallbackRes.status}`
           );
         }
       }
     } catch (e) {
       console.warn(
-        `❌ NEGATIVE RESPONSE: Imagen fallback failed with error: ${e instanceof Error ? e.message : String(e)}`,
+        `❌ NEGATIVE RESPONSE: Imagen fallback failed with error: ${e instanceof Error ? e.message : String(e)}`
       );
     }
 
@@ -523,14 +491,13 @@ Render text centered on pure green background #00FF00. Return PNG image bytes.`,
     // FALLBACK 4: Return style analysis so client renders locally (last resort)
     // ===================================================================
     console.log(
-      `❌ FINAL STATUS: All image generation APIs failed (Gemini, Pollinations, HuggingFace, Imagen). No image was generated by any provider. Falling back to client-side local rendering.`,
+      `❌ FINAL STATUS: All image generation APIs failed (Gemini, Pollinations, HuggingFace, Imagen). No image was generated by any provider. Falling back to client-side local rendering.`
     );
     return NextResponse.json(
       {
         success: false,
         fallback: true,
-        error:
-          "All image generation APIs failed. Falling back to client-side local rendering.",
+        error: "All image generation APIs failed. Falling back to client-side local rendering.",
         styleAnalysis: styleInfo,
         movieName,
         model: "Client-side Local Canvas Rendering (Fallback)",
@@ -538,12 +505,8 @@ Render text centered on pure green background #00FF00. Return PNG image bytes.`,
       { status: 200 },
     );
   } catch (err) {
-    const errorMsg =
-      err instanceof Error ? err.message : "Internal server error";
-    console.error(
-      `❌ CRITICAL ERROR: Generation request failed with error: ${errorMsg}`,
-      err,
-    );
+    const errorMsg = err instanceof Error ? err.message : "Internal server error";
+    console.error(`❌ CRITICAL ERROR: Generation request failed with error: ${errorMsg}`, err);
     return NextResponse.json(
       {
         success: false,

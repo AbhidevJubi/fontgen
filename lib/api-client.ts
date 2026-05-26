@@ -53,16 +53,44 @@ export interface MovieData {
   sampleImagesUrls: string[];
 }
 
-function normalizeMovieRow(row: any): MovieData {
+type MovieDbRow = Partial<{
+  id: string;
+  movie_name: string;
+  movieName: string;
+  language: string;
+  actor: string;
+  year: number;
+  featured: boolean;
+  title_image_url: string;
+  titleImageUrl: string;
+  sample_images_urls: string[];
+  sampleImagesUrls: string[];
+}>;
+
+function normalizeMovieRow(row: MovieDbRow): MovieData {
   return {
-    id: row.id,
-    movieName: row.movie_name ?? row.movieName,
-    language: row.language,
-    actor: row.actor,
-    year: row.year,
-    featured: row.featured,
-    titleImageUrl: row.title_image_url ?? row.titleImageUrl,
-    sampleImagesUrls: row.sample_images_urls ?? row.sampleImagesUrls ?? [],
+    id: typeof row.id === "string" ? row.id : undefined,
+    movieName:
+      typeof row.movie_name === "string"
+        ? row.movie_name
+        : typeof row.movieName === "string"
+          ? row.movieName
+          : "",
+    language: typeof row.language === "string" ? row.language : "",
+    actor: typeof row.actor === "string" ? row.actor : "",
+    year: typeof row.year === "number" ? row.year : Number(row.year) || 0,
+    featured: Boolean(row.featured),
+    titleImageUrl:
+      typeof row.title_image_url === "string"
+        ? row.title_image_url
+        : typeof row.titleImageUrl === "string"
+          ? row.titleImageUrl
+          : "",
+    sampleImagesUrls: Array.isArray(row.sample_images_urls)
+      ? row.sample_images_urls
+      : Array.isArray(row.sampleImagesUrls)
+        ? row.sampleImagesUrls
+        : [],
   };
 }
 
@@ -172,7 +200,7 @@ export interface GenerateTitleResult {
   success: boolean;
   generatedImage?: string;
   fallback?: boolean;
-  styleAnalysis?: any;
+  styleAnalysis?: unknown;
   movieName?: string;
   model?: string;
   error?: string;

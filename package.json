@@ -20,7 +20,6 @@
     "replicate": "^1.4.0"
   },
   "devDependencies": {
-    "@netlify/plugin-nextjs": "^5.15.11",
     "@tailwindcss/postcss": "^4",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
